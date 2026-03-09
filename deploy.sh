@@ -53,9 +53,13 @@ if 'versions' not in versions_data:
     versions_data['versions'] = {}
     versions_data['stable'] = True
 
+now = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
+
 versions_data['versions'][version] = {
     'manifest': manifest,
-    'creationDate': datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
+    'creationDate': now,
+    'ts': now,
+    'publishState': 'published'
 }
 
 with open('CloudronVersions.json', 'w') as f:
