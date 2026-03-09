@@ -45,24 +45,18 @@ manifest['packagerName'] = 'John Schneider'
 manifest['packagerUrl'] = 'https://github.com/CombinedTurtle'
 manifest['contactEmail'] = 'john@didactgroup.com'
 
-try:
-    with open('CloudronVersions.json', 'r') as f:
-        versions_data = json.load(f)
-except FileNotFoundError:
-    import json
-    versions_data = {'stable': True, 'versions': {}}
-
-if 'versions' not in versions_data:
-    versions_data['versions'] = {}
-    versions_data['stable'] = True
-
 now = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
 
-versions_data['versions'][version] = {
-    'manifest': manifest,
-    'creationDate': now,
-    'ts': now,
-    'publishState': 'published'
+versions_data = {
+    'stable': True,
+    'versions': {
+        version: {
+            'manifest': manifest,
+            'creationDate': now,
+            'ts': now,
+            'publishState': 'published'
+        }
+    }
 }
 
 with open('CloudronVersions.json', 'w') as f:
