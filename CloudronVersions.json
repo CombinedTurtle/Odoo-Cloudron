@@ -1,0 +1,34 @@
+{
+  "com.didactgroup.odoocommunity": {
+    "1.0.3": {
+      "image": "sentientlemon/odoocommunity:1.0.3",
+      "manifest": {
+        "manifestVersion": 2,
+        "id": "com.didactgroup.odoocommunity",
+        "title": "Odoo Community",
+        "author": "Didact Group",
+        "description": "Open Source ERP and CRM",
+        "version": "1.0.3",
+        "healthCheckPath": "/",
+        "httpPort": 8069,
+        "memoryLimit": 2147483648,
+        "addons": {
+          "ldap": {
+            "version": "1"
+          },
+          "sendmail": {
+            "version": "1"
+          },
+          "localstorage": {}
+        },
+        "tags": [
+          "erp",
+          "crm",
+          "business"
+        ],
+        "website": "https://www.odoo.com/",
+        "postInstallMessage": "Default login: admin / changeme. Please change the admin password after first login via Settings > Users.\n\nCustom Addons: Upload modules to /app/data/addons/ via SFTP (port 222) or File Manager, then restart the app.\n\nDatabase Restore: Upload a pg_dump file to /app/data/restore/database.dump and optionally a filestore/ directory, then restart the app."
+      }
+    }
+  }
+}

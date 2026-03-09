@@ -31,20 +31,20 @@ This repository contains the necessary files to build and deploy the Odoo 19 Com
 ## How to Build and Deploy
 
 1.  **Build the Docker Image**:
-    Ensure you specify the `linux/amd64` platform, as Cloudron requires it. Replace `registry.example.com/yourusername/odoo:1.0.0` with your actual registry path.
+    Ensure you specify the `linux/amd64` platform, as Cloudron requires it. Replace `sentientlemon/odoocommunity:1.0.0` with your actual registry path.
     ```bash
-    DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -t registry.example.com/yourusername/odoo:1.0.0 .
+    DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -t sentientlemon/odoocommunity:1.0.0 .
     ```
 
 2.  **Push the Image**:
     ```bash
-    docker push registry.example.com/yourusername/odoo:1.0.0
+    docker push sentientlemon/odoocommunity:1.0.0
     ```
 
 3.  **Install on Cloudron**:
     Use the Cloudron CLI to install the app on your server. Replace `odoo.yourcloudrondomain.com` with your desired subdomain.
     ```bash
-    cloudron install --image registry.example.com/yourusername/odoo:1.0.0 --location odoo.yourcloudrondomain.com
+    cloudron install --image sentientlemon/odoocommunity:1.0.0 --location odoo.yourcloudrondomain.com
     ```
 
 ## Post-Installation Usage

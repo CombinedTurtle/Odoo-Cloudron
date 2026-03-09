@@ -35,17 +35,17 @@ You’ll need the [Odoo 19 Community source code](https://www.odoo.com/page/down
 
 ```bash
 # Build the image targeting Cloudron's required amd64 architecture
-DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -t your-registry.com/odoocommunity:1.0.0 .
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker build -t sentientlemon/odoocommunity:1.0.0 .
 
 # Push it to your registry
-docker push your-registry.com/odoocommunity:1.0.0
+docker push sentientlemon/odoocommunity:1.0.0
 ```
 
 ### Step 2: Install via Cloudron CLI
 With the image pushed, use the Cloudron Command Line Interface to deploy it to your server:
 
 ```bash
-cloudron install --image your-registry.com/odoocommunity:1.0.0 --location erp.yourdomain.com
+cloudron install --image sentientlemon/odoocommunity:1.0.0 --location erp.yourdomain.com
 ```
 
 Cloudron will pull the image, configure NGINX reverse proxies, provision SSL certificates from Let's Encrypt, and start the container.

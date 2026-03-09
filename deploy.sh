@@ -6,7 +6,7 @@ echo " Cloudron App Automated Deploy Script"
 echo "========================================"
 
 # Configuration
-REGISTRY="registry.schneider-systems.com/com.didactgroup.odoocommunity"
+REGISTRY="sentientlemon/odoocommunity"
 APP_DOMAIN="odootest2.schneider-systems.com"
 MANIFEST="CloudronManifest.json"
 
