@@ -40,6 +40,7 @@ version = manifest['version']
 
 # The community app format requires dockerImage to be injected into the manifest
 manifest['dockerImage'] = f'${REGISTRY}:{version}'
+manifest['iconUrl'] = 'https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/logo.svg'
 manifest['packagerName'] = 'John Schneider'
 manifest['packagerUrl'] = 'https://github.com/CombinedTurtle'
 manifest['contactEmail'] = 'john@didactgroup.com'
@@ -77,7 +78,7 @@ docker push "$IMAGE_TAG"
 # Update Cloudron App
 echo ""
 echo "=> Updating Cloudron app at $APP_DOMAIN..."
-cloudron update --app "$APP_DOMAIN" --image "$IMAGE_TAG"
+# cloudron update --app "$APP_DOMAIN" --image "$IMAGE_TAG"
 
 echo ""
 echo "========================================"

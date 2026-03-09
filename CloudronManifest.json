@@ -7,11 +7,11 @@
   "tagline": "Open Source ERP and CRM",
   "changelog": "Initial release on the Cloudron Community App Store.",
   "upstreamVersion": "19.0",
-  "minBoxVersion": "7.1.0",
+  "minBoxVersion": "9.1.0",
   "mediaLinks": [
     "https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/logo.svg"
   ],
-  "version": "1.0.19",
+  "version": "1.0.20",
   "healthCheckPath": "/",
   "httpPort": 8069,
   "memoryLimit": 2147483648,
