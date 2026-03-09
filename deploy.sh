@@ -31,6 +31,35 @@ with open('$MANIFEST', 'w') as f:
 print(new_v)
 ")
 
+echo "Generating CloudronVersions.json..."
+python3 -c "
+import json, datetime
+with open('CloudronManifest.json', 'r') as f:
+    manifest = json.load(f)
+version = manifest['version']
+
+# The community app format requires dockerImage to be injected into the manifest
+manifest['dockerImage'] = f'${REGISTRY}:{version}'
+
+try:
+    with open('CloudronVersions.json', 'r') as f:
+        versions_data = json.load(f)
+except FileNotFoundError:
+    import json
+    versions_data = {'stable': True, 'versions': {}}
+
+if 'versions' not in versions_data:
+    versions_data['versions'] = {}
+    versions_data['stable'] = True
+
+versions_data['versions'][version] = {
+    'manifest': manifest,
+    'creationDate': datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
+}
+
+with open('CloudronVersions.json', 'w') as f:
+    json.dump(versions_data, f, indent=2)
+"
 echo "New version: $NEW_VERSION"
 IMAGE_TAG="$REGISTRY:$NEW_VERSION"
 
