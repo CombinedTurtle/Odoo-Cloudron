@@ -40,6 +40,7 @@ version = manifest['version']
 
 # The community app format requires dockerImage to be injected into the manifest
 manifest['dockerImage'] = f'${REGISTRY}:{version}'
+manifest['iconUrl'] = 'https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/logo.svg'
 
 try:
     with open('CloudronVersions.json', 'r') as f:

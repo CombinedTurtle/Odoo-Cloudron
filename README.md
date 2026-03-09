@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://odoocdn.com/openerp_website/static/src/img/assets/svg/odoo_logo.svg" width="200" alt="Odoo Logo">
+</p>
+
 # Cloudron Odoo Community App
 
 This repository contains the necessary files to build and deploy the Odoo 19 Community Edition as a native Cloudron application.
