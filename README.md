@@ -39,6 +39,7 @@ You can install this app directly onto your Cloudron server without touching the
 1. Open your Cloudron Dashboard.
 2. Navigate to the **App Store**.
 3. Click the gear icon in the top right and select **Add Custom App**.
+   * **Note**: Your Cloudron server must be running **v9.1.0 or higher**. The custom app store spec requires the `iconUrl` field, which older versions of Cloudron will reject.
 4. Paste the following URL:
    ```text
    https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/CloudronVersions.json

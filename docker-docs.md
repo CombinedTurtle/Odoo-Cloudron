@@ -16,6 +16,7 @@ You do not need to pull this Docker image manually! You can install it directly 
 1. Open your Cloudron Dashboard.
 2. Navigate to the **App Store**.
 3. Click the gear icon in the top right and select **Add Custom App**.
+   * **Note**: Your Cloudron server must be running **v9.1.0 or higher**. The custom app store spec requires the `iconUrl` field, which older versions of Cloudron will reject.
 4. Paste the following URL:
    `https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/CloudronVersions.json`
 5. Click **Install**. Cloudron will take care of the rest!
