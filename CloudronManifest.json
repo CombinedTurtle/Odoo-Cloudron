@@ -4,7 +4,7 @@
   "title": "Odoo Community",
   "author": "Didact Group",
   "description": "Open Source ERP and CRM",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "healthCheckPath": "/",
   "httpPort": 8069,
   "memoryLimit": 2147483648,
