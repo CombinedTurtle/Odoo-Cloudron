@@ -28,9 +28,20 @@ Building this package was a very iterative process. Here are the key hurdles we 
 
 ## How to Deploy Odoo on Cloudron
 
-Want to host this yourself? Here is the step-by-step process.
+Want to host this yourself? There are two ways to deploy it.
 
-### Step 1: Build the Image
+### Option 1: Quick Install (App Store)
+
+You can install this app directly to your Cloudron server via the Custom App Store feature without touching a command line:
+
+1. Open your Cloudron Dashboard and go to the **App Store**.
+2. Click the gear icon in the top right and select **Add Custom App**.
+3. Paste our manifest URL:
+   `https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/CloudronVersions.json`
+4. Click **Install**. Cloudron will automatically download the pre-built Docker image.
+
+### Option 2: Build from Source
+
 You’ll need the [Odoo 19 Community source code](https://www.odoo.com/page/download) and Docker installed on your machine. Using the `Dockerfile` and `CloudronManifest.json` from our repository:
 
 ```bash
