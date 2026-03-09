@@ -14,7 +14,7 @@ This repository contains the necessary files to build and deploy the Odoo 19 Com
 ## Prerequisites for Building
 
 1.  **Odoo Source Code**: You need the Odoo 19 Community source code.
-    *   Download the source and extract it.
+    *   [Download the source](https://www.odoo.com/page/download) and extract it.
     *   Place the extracted directory (e.g., `odoo-19.0.post20260307`) in the same directory as these files.
     *   **Important**: Update the `COPY` command in the `Dockerfile` to match your exact Odoo source folder name:
         ```dockerfile

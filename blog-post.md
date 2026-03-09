@@ -31,7 +31,7 @@ Building this package was a very iterative process. Here are the key hurdles we 
 Want to host this yourself? Here is the step-by-step process.
 
 ### Step 1: Build the Image
-You’ll need the Odoo 19 Community source code and Docker installed on your machine. Using the `Dockerfile` and `CloudronManifest.json` from our repository:
+You’ll need the [Odoo 19 Community source code](https://www.odoo.com/page/download) and Docker installed on your machine. Using the `Dockerfile` and `CloudronManifest.json` from our repository:
 
 ```bash
 # Build the image targeting Cloudron's required amd64 architecture
