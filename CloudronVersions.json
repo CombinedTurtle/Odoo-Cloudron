@@ -1,14 +1,15 @@
 {
   "stable": true,
   "versions": {
-    "1.0.13": {
+    "1.0.14": {
       "manifest": {
         "manifestVersion": 2,
         "id": "com.didactgroup.odoocommunity",
         "title": "Odoo Community",
         "author": "Didact Group",
-        "description": "Open Source ERP and CRM",
-        "version": "1.0.13",
+        "description": "A comprehensive open source ERP and CRM platform.",
+        "tagline": "Open Source ERP and CRM",
+        "version": "1.0.14",
         "healthCheckPath": "/",
         "httpPort": 8069,
         "memoryLimit": 2147483648,
@@ -28,15 +29,14 @@
         ],
         "website": "https://www.odoo.com/",
         "postInstallMessage": "Default login: admin / changeme. Please change the admin password after first login via Settings > Users.\n\nCustom Addons: Upload modules to /app/data/addons/ via SFTP (port 222) or File Manager, then restart the app.\n\nDatabase Restore: Upload a pg_dump file to /app/data/restore/database.dump and optionally a filestore/ directory, then restart the app.",
-        "dockerImage": "sentientlemon/odoocommunity:1.0.13",
+        "dockerImage": "sentientlemon/odoocommunity:1.0.14",
         "iconUrl": "https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/logo.svg",
         "packagerName": "John Schneider",
         "packagerUrl": "https://github.com/CombinedTurtle",
-        "contactEmail": "john@didactgroup.com",
-        "tagline": "Open Source ERP and CRM"
+        "contactEmail": "john@didactgroup.com"
       },
-      "creationDate": "Mon, 09 Mar 2026 03:27:14 GMT",
-      "ts": "Mon, 09 Mar 2026 03:27:14 GMT",
+      "creationDate": "Mon, 09 Mar 2026 03:29:21 GMT",
+      "ts": "Mon, 09 Mar 2026 03:29:21 GMT",
       "publishState": "published"
     }
   }

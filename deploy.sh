@@ -44,7 +44,6 @@ manifest['iconUrl'] = 'https://raw.githubusercontent.com/CombinedTurtle/Odoo-Clo
 manifest['packagerName'] = 'John Schneider'
 manifest['packagerUrl'] = 'https://github.com/CombinedTurtle'
 manifest['contactEmail'] = 'john@didactgroup.com'
-manifest['tagline'] = 'Open Source ERP and CRM'
 
 now = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
 
