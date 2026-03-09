@@ -1,0 +1,10 @@
+# Ignore Odoo source code directories
+odoo-19.0*/
+odoo-18.0*/
+odoo-*.tar.gz
+odoo-*.zip
+
+# Ignore environment/system files
+.DS_Store
+*.swp
+*~
