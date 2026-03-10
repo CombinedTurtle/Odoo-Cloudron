@@ -3,6 +3,13 @@ FROM ubuntu:24.04
 # Cloudron baseline
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Add the official PostgreSQL repository (Ubuntu 24.04 only ships PG 16)
+RUN apt-get update && apt-get install -y --no-install-recommends wget gnupg ca-certificates \
+    && install -d /usr/share/postgresql-common/pgdg \
+    && wget --quiet -O /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && rm -rf /var/lib/apt/lists/*
+
 # Prerequisites
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
@@ -37,7 +44,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gettext-base \
     supervisor \
     postgresql-16 \
-    postgresql-client-16 \
+    postgresql-17 \
+    postgresql-client-17 \
     gosu \
     && rm -rf /var/lib/apt/lists/*
 
