@@ -70,38 +70,105 @@ fi
 
 # 4. Database Restore (sentinel file pattern)
 # To restore a database:
-#   1. Upload a pg_dump file to /app/data/restore/database.dump
+#   1. Upload a pg_dump file to /app/data/restore/database.dump (custom format via pg_dump -Fc)
+#      OR a plain SQL dump to /app/data/restore/dump.sql
 #   2. Optionally upload filestore to /app/data/restore/filestore/ 
 #   3. Restart the app — the restore will run automatically
-#   4. The sentinel files are removed after restore completes
+#   4. The sentinel files are removed after a SUCCESSFUL restore only
+DUMP_FILE=""
 if [ -f "${RESTORE_DIR}/database.dump" ]; then
+    DUMP_FILE="${RESTORE_DIR}/database.dump"
+    DUMP_FORMAT="custom"
+elif [ -f "${RESTORE_DIR}/dump.sql" ]; then
+    DUMP_FILE="${RESTORE_DIR}/dump.sql"
+    DUMP_FORMAT="sql"
+fi
+
+if [ -n "${DUMP_FILE}" ]; then
     echo "=== DATABASE RESTORE DETECTED ==="
-    echo "Restoring database from ${RESTORE_DIR}/database.dump ..."
+    echo "Restoring database from ${DUMP_FILE} (format: ${DUMP_FORMAT})..."
     
     # Drop and recreate the database
-    gosu postgres psql -h 127.0.0.1 -U postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='odoo_prod' AND pid <> pg_backend_pid();" || true
-    gosu postgres psql -h 127.0.0.1 -U postgres -c "DROP DATABASE IF EXISTS odoo_prod;"
-    gosu postgres psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE odoo_prod OWNER odoo;"
+    echo "Terminating existing connections to odoo_prod..."
+    gosu postgres psql -h 127.0.0.1 -U postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='odoo_prod' AND pid <> pg_backend_pid();" 2>&1 || true
     
-    # Restore the dump
-    gosu postgres pg_restore -h 127.0.0.1 -U postgres -d odoo_prod --no-owner --role=odoo "${RESTORE_DIR}/database.dump" || true
+    echo "Dropping database odoo_prod..."
+    gosu postgres psql -h 127.0.0.1 -U postgres -c "DROP DATABASE IF EXISTS odoo_prod;" 2>&1
     
-    echo "Database restored successfully."
+    echo "Creating fresh database odoo_prod..."
+    gosu postgres psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE odoo_prod OWNER odoo;" 2>&1
     
-    # Restore filestore if provided
-    if [ -d "${RESTORE_DIR}/filestore" ]; then
-        echo "Restoring filestore..."
-        rm -rf /app/data/filestore/odoo_prod
-        mkdir -p /app/data/filestore/odoo_prod
-        cp -r ${RESTORE_DIR}/filestore/* /app/data/filestore/odoo_prod/
-        chown -R cloudron:cloudron /app/data/filestore/
-        echo "Filestore restored."
+    # Restore the dump with proper error handling
+    RESTORE_LOG="/tmp/restore_output.log"
+    RESTORE_OK=0
+    
+    if [ "${DUMP_FORMAT}" = "custom" ]; then
+        echo "Running pg_restore (custom format)..."
+        if gosu postgres pg_restore -h 127.0.0.1 -U postgres -d odoo_prod --no-owner --role=odoo "${DUMP_FILE}" 2>&1 | tee "${RESTORE_LOG}"; then
+            RESTORE_OK=1
+        else
+            # pg_restore returns non-zero even on warnings; check if tables actually exist
+            TABLE_COUNT=$(gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public';")
+            echo "pg_restore exited with warnings/errors. Tables created: ${TABLE_COUNT}"
+            if [ "${TABLE_COUNT}" -gt 10 ]; then
+                echo "Sufficient tables found — treating restore as successful despite warnings."
+                RESTORE_OK=1
+            else
+                echo "ERROR: Restore appears to have failed. Only ${TABLE_COUNT} tables found."
+                echo "=== RESTORE LOG ==="
+                cat "${RESTORE_LOG}"
+                echo "=== END RESTORE LOG ==="
+            fi
+        fi
+    else
+        echo "Running psql restore (plain SQL format)..."
+        if gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -f "${DUMP_FILE}" 2>&1 | tee "${RESTORE_LOG}"; then
+            RESTORE_OK=1
+        else
+            TABLE_COUNT=$(gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public';")
+            echo "psql exited with warnings/errors. Tables created: ${TABLE_COUNT}"
+            if [ "${TABLE_COUNT}" -gt 10 ]; then
+                echo "Sufficient tables found — treating restore as successful despite warnings."
+                RESTORE_OK=1
+            else
+                echo "ERROR: Restore appears to have failed. Only ${TABLE_COUNT} tables found."
+                echo "=== RESTORE LOG ==="
+                cat "${RESTORE_LOG}"
+                echo "=== END RESTORE LOG ==="
+            fi
+        fi
     fi
     
-    # Clean up sentinel files
-    rm -f "${RESTORE_DIR}/database.dump"
-    rm -rf "${RESTORE_DIR}/filestore"
-    echo "=== RESTORE COMPLETE ==="
+    if [ "${RESTORE_OK}" = "1" ]; then
+        echo "Database restored successfully."
+        
+        # Restore filestore if provided
+        if [ -d "${RESTORE_DIR}/filestore" ]; then
+            echo "Restoring filestore..."
+            rm -rf /app/data/filestore/odoo_prod
+            mkdir -p /app/data/filestore/odoo_prod
+            cp -r ${RESTORE_DIR}/filestore/* /app/data/filestore/odoo_prod/
+            chown -R cloudron:cloudron /app/data/filestore/
+            echo "Filestore restored."
+        fi
+        
+        # Clean up sentinel files ONLY on success
+        rm -f "${RESTORE_DIR}/database.dump"
+        rm -f "${RESTORE_DIR}/dump.sql"
+        rm -rf "${RESTORE_DIR}/filestore"
+        rm -f "${RESTORE_DIR}/manifest.json"
+        rm -f "${RESTORE_DIR}"/*.zip
+        echo "=== RESTORE COMPLETE ==="
+    else
+        echo "=== RESTORE FAILED ==="
+        echo "Sentinel files have NOT been deleted so you can retry."
+        echo "Check /tmp/restore_output.log inside the container for details."
+        echo "The app will start with an empty database."
+        
+        # Recreate a minimal working database so healthcheck passes
+        gosu postgres psql -h 127.0.0.1 -U postgres -c "DROP DATABASE IF EXISTS odoo_prod;" 2>&1
+        gosu postgres psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE odoo_prod OWNER odoo;" 2>&1
+    fi
 fi
 
 # 5. Start Odoo
