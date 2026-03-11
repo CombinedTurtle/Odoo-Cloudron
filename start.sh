@@ -152,6 +152,20 @@ if [ -n "${DUMP_FILE}" ]; then
             echo "Filestore restored."
         fi
         
+        # Fix domain references to match this Cloudron instance
+        APP_DOMAIN="${CLOUDRON_APP_DOMAIN:-}"
+        if [ -n "${APP_DOMAIN}" ]; then
+            echo "Updating domain references to https://${APP_DOMAIN}..."
+            gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -c \
+                "UPDATE ir_config_parameter SET value = 'https://${APP_DOMAIN}' WHERE key = 'web.base.url';" 2>&1
+            gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -c \
+                "UPDATE ir_config_parameter SET value = 'https://${APP_DOMAIN}' WHERE key = 'web.base.url.freeze';" 2>&1
+            # Clear per-website domains to prevent redirect loops (users can reconfigure later)
+            gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -c \
+                "UPDATE website SET domain = NULL;" 2>&1
+            echo "Domain references updated."
+        fi
+        
         # Clean up sentinel files ONLY on success
         rm -f "${RESTORE_DIR}/database.dump"
         rm -f "${RESTORE_DIR}/dump.sql"
@@ -171,6 +185,44 @@ if [ -n "${DUMP_FILE}" ]; then
     fi
 fi
 
-# 5. Start Odoo
+# 5. Patch core Odoo modules with user overrides
+# Cloudron mounts /app/code as read-only, so we can't write into site-packages.
+# Odoo's _NamespacePath always puts site-packages first, ignoring addons_path order.
+# To force overrides, we create a proper Python namespace package structure
+# mirroring odoo/addons/ inside a writable directory and inject it via PYTHONPATH.
+OVERRIDE_BASE="/run/odoo-overrides"
+OVERRIDE_DIR="${OVERRIDE_BASE}/odoo/addons"
+rm -rf "${OVERRIDE_BASE}"
+mkdir -p "${OVERRIDE_DIR}"
+PATCHED=0
+BUILTIN_ADDONS="/app/code/venv/lib/python3.12/site-packages/odoo/addons"
+if [ -d "/app/data/addons" ]; then
+    for addon_dir in /app/data/addons/*/; do
+        if [ -f "${addon_dir}__manifest__.py" ]; then
+            addon_name=$(basename "$addon_dir")
+            cp -a "$addon_dir" "${OVERRIDE_DIR}/${addon_name}"
+            # If this overrides a built-in module, tag its display name with (User)
+            if [ -d "${BUILTIN_ADDONS}/${addon_name}" ]; then
+                echo "  Overriding built-in module: ${addon_name}"
+                sed -i "s/^\(\s*'name'\s*:\s*'\)\(.*\)'\s*,/\1\2 (User)',/" "${OVERRIDE_DIR}/${addon_name}/__manifest__.py"
+            else
+                echo "  Adding custom module: ${addon_name}"
+            fi
+            PATCHED=$((PATCHED + 1))
+        fi
+    done
+fi
+if [ "$PATCHED" -gt 0 ]; then
+    echo "Patched ${PATCHED} module(s). Injecting ${OVERRIDE_BASE} via PYTHONPATH."
+    chown -R cloudron:cloudron "${OVERRIDE_BASE}"
+    export PYTHONPATH="${OVERRIDE_BASE}:${PYTHONPATH:-}"
+    # Also prepend to addons_path so Odoo's module scanner finds them
+    sed -i "s|^addons_path = |addons_path = ${OVERRIDE_DIR},|" "${CONFIG_FILE}"
+else
+    echo "No user module overrides found (skipping patch)."
+fi
+
+# 6. Start Odoo
 echo "Starting Odoo server..."
-exec su - cloudron -c "/app/code/venv/bin/odoo -c /app/data/odoo.conf"
+exec su - cloudron -s /bin/bash -c "PYTHONPATH='${PYTHONPATH:-}' /app/code/venv/bin/odoo -c /app/data/odoo.conf"
+
