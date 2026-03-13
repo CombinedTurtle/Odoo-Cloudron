@@ -6,6 +6,26 @@
 
 This repository contains the necessary files to build and deploy the Odoo 19 Community Edition as a native Cloudron application.
 
+## Quick Install (Cloudron App Store)
+
+You can install this app directly onto your Cloudron server without touching the command line.
+
+1. Open your Cloudron Dashboard.
+2. Navigate to the **App Store**.
+3. Click the gear icon in the top right and select **Add Custom App**.
+   * **Note**: Your Cloudron server must be running **v9.1.0 or higher**. The custom app store spec requires the `iconUrl` field, which older versions of Cloudron will reject.
+4. Paste the following URL:
+   ```text
+   https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/CloudronVersions.json
+   ```
+5. Click **Install**. Cloudron will automatically download the pre-built image and configure the app.
+
+## Key Features:
+1. Allows addons (in app/data/addons)
+2. Supports overriding of modules, similar to Odoo.sh's system.
+3. Supports LDAP (manual configuration required, looking to add automatic setup)
+4. Supports updates without overwriting user data.
+
 ## Repository Contents
 
 *   **`Dockerfile`**: The multi-stage Dockerfile that builds the Ubuntu 24.04 environment, installs PostgreSQL 16, Python dependencies, and Odoo itself.
@@ -31,20 +51,6 @@ This repository contains the necessary files to build and deploy the Odoo 19 Com
     cloudron login
     ```
 3.  **Docker Registry**: You need access to a Docker registry to push your built image (e.g., Docker Hub, GitLab Registry, or a private registry).
-
-## Quick Install (Cloudron App Store)
-
-You can install this app directly onto your Cloudron server without touching the command line.
-
-1. Open your Cloudron Dashboard.
-2. Navigate to the **App Store**.
-3. Click the gear icon in the top right and select **Add Custom App**.
-   * **Note**: Your Cloudron server must be running **v9.1.0 or higher**. The custom app store spec requires the `iconUrl` field, which older versions of Cloudron will reject.
-4. Paste the following URL:
-   ```text
-   https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/CloudronVersions.json
-   ```
-5. Click **Install**. Cloudron will automatically download the pre-built image and configure the app.
 
 ## How to Build and Deploy (Manual)
 
