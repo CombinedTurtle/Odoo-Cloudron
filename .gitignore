@@ -4,6 +4,10 @@ odoo-18.0*/
 odoo-*.tar.gz
 odoo-*.zip
 
+# Ignore some documentation
+blog-post.md
+docker-docs.md
+
 # Ignore environment/system files
 .DS_Store
 *.swp
