@@ -58,10 +58,17 @@ if [ ! -d "$PGDATA" ]; then
     echo "host all all 127.0.0.1/32 trust" >> "$PGDATA/pg_hba.conf"
 fi
 
+# Fix ownership after Cloudron backup/restore.
+# Cloudron remaps all files in /app/data to its own UID during backup/restore,
+# which makes postgresql.conf and data files unreadable by the postgres user.
+# This chown is required on every boot to guarantee correct ownership.
+chown -R postgres:postgres "$PGDATA" /var/run/postgresql
+chmod 700 "$PGDATA"
+
 # Clean up stale PID and socket files from backup restore or unclean shutdown.
 # This is safe because supervisord guarantees no legitimate PostgreSQL process is
 # running when this script is first invoked in a fresh container.
-if [ -d "$PGDATA" ] && [ -f "$PGDATA/postmaster.pid" ]; then
+if [ -f "$PGDATA/postmaster.pid" ]; then
     echo "Removing stale postmaster.pid (leftover from backup restore or crash)..."
     rm -f "$PGDATA/postmaster.pid"
 fi
