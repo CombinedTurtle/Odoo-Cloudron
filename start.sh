@@ -222,7 +222,40 @@ else
     echo "No user module overrides found (skipping patch)."
 fi
 
-# 6. Start Odoo
+# 6. Sync Cloudron domain configuration into Odoo
+APP_DOMAIN="${CLOUDRON_APP_DOMAIN:-}"
+ALIAS_DOMAINS="${CLOUDRON_ALIAS_DOMAINS:-}"
+
+if [ -n "${APP_DOMAIN}" ]; then
+    echo "Setting web.base.url to https://${APP_DOMAIN}..."
+    gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -c \
+        "UPDATE ir_config_parameter SET value = 'https://${APP_DOMAIN}' WHERE key = 'web.base.url';" 2>&1
+    gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -c \
+        "INSERT INTO ir_config_parameter (key, value, create_uid, create_date, write_uid, write_date)
+         SELECT 'web.base.url', 'https://${APP_DOMAIN}', 1, now(), 1, now()
+         WHERE NOT EXISTS (SELECT 1 FROM ir_config_parameter WHERE key = 'web.base.url');" 2>&1
+fi
+
+if [ -n "${ALIAS_DOMAINS}" ]; then
+    echo "Syncing Cloudron alias domains: ${ALIAS_DOMAINS}"
+
+    # Check if website table exists (website module may not be installed)
+    HAS_WEBSITE=$(gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -tAc \
+        "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'website');")
+
+    if [ "${HAS_WEBSITE}" = "t" ]; then
+        # Ensure the primary website has the primary domain set
+        gosu postgres psql -h 127.0.0.1 -U postgres -d odoo_prod -c \
+            "UPDATE website SET domain = 'https://${APP_DOMAIN}' WHERE id = (SELECT MIN(id) FROM website) AND (domain IS NULL OR domain = '');" 2>&1
+        echo "Alias domains synced. Configure alias-to-website mapping via Odoo Settings > Websites."
+    else
+        echo "Website module not installed — alias domains work via proxy_mode (Host header routing)."
+    fi
+else
+    echo "No alias domains configured."
+fi
+
+# 7. Start Odoo
 echo "Starting Odoo server..."
 exec su - cloudron -s /bin/bash -c "PYTHONPATH='${PYTHONPATH:-}' /app/code/venv/bin/odoo -c /app/data/odoo.conf"
 
