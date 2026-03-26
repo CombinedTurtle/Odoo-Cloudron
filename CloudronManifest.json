@@ -11,9 +11,9 @@
   "mediaLinks": [
     "https://raw.githubusercontent.com/CombinedTurtle/Odoo-Cloudron/main/logo.svg"
   ],
-  "version": "1.0.32",
+  "version": "1.0.34",
   "multiDomain": true,
-  "healthCheckPath": "/",
+  "healthCheckPath": "/web/health",
   "httpPort": 8069,
   "memoryLimit": 2147483648,
   "addons": {
