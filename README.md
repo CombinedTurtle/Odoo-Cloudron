@@ -113,21 +113,6 @@ To handle more users or scheduled operations, you can modify the following param
 *   **`workers`**: Controls the number of web workers processing concurrent HTTP requests. As a rule of thumb, set this to `(CPU Cores * 2) + 1`. Increase this value if you assign the Cloudron app more RAM / CPU limits (default is `2`).
 *   **`max_cron_threads`**: Governs the number of background workers handling scheduled system operations, such as automated emails or invoice calculation (default is `1`).
 
-### Updating the App (Pushing Changes)
-Cloudron manages updates non-destructively. Because all database files and custom configuration live in the persistent `/app/data` directory, you can push updates to the Docker container without breaking existing installations.
-
-To automate the update process, we have included a **`deploy.sh`** script. When you make changes to the source code (like modifying `start.sh` or the `Dockerfile`):
-
-1. Run the deployment script from this directory:
-   ```bash
-   ./deploy.sh
-   ```
-2. The script will automatically:
-   * Bump the patch version number in `CloudronManifest.json` (e.g., from `1.0.0` to `1.0.1`).
-   * Build the new Docker image (`docker build`).
-   * Push the new image to your configured registry (`docker push`).
-   * Instruct Cloudron to pull the new image, take a backup, and swap the application container (`cloudron update --image`).
-
 ### Configuring Cloudron Integrations (LDAP/SMTP)
 Currently, configuring Cloudron's built-in LDAP and SMTP requires manual setup within the Odoo admin interface.
 *   **LDAP**: Go to Settings -> General Settings -> Integrations -> LDAP Server. Use the environment variables provided in the Cloudron app's "Terminal" view (e.g., `CLOUDRON_LDAP_SERVER`, `CLOUDRON_LDAP_BIND_DN`) to configure the connection.
