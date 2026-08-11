@@ -255,7 +255,12 @@ else
     echo "No alias domains configured."
 fi
 
-# 7. Start Odoo
+# 7. Generate nginx configuration (internal reverse proxy for long-polling + websockets)
+echo "Generating nginx configuration for real-time proxy..."
+mkdir -p /tmp/nginx_client_body /tmp/nginx_proxy /tmp/nginx_fastcgi /tmp/nginx_uwsgi /tmp/nginx_scgi
+cp /app/code/nginx.conf.template /run/odoo-nginx.conf
+
+# 8. Start Odoo
 echo "Starting Odoo server..."
 exec su - cloudron -s /bin/bash -c "PYTHONPATH='${PYTHONPATH:-}' /app/code/venv/bin/odoo -c /app/data/odoo.conf"
 
