@@ -43,6 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-noto-cjk \
     gettext-base \
     supervisor \
+    nginx \
     postgresql-16 \
     postgresql-17 \
     postgresql-client-17 \
@@ -81,6 +82,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY start-postgres.sh /app/pkg/start-postgres.sh
 COPY start.sh /app/pkg/start-odoo.sh
 COPY odoo.conf.template /app/code/
+COPY nginx.conf.template /app/code/
 RUN chmod +x /app/pkg/start-postgres.sh /app/pkg/start-odoo.sh
 
 # Create directories for postgresql runtime
